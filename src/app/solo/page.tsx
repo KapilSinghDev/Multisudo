@@ -61,20 +61,24 @@ const Cell: React.FC<CellProps> = ({
 
 export default function SoloPlayer() {
   const actRef = useRef<(HTMLInputElement | null)[][]>(
-    Array(9).fill(null).map(() => Array(9).fill(null))
+    Array(9)
+      .fill(null)
+      .map(() => Array(9).fill(null))
   );
-  
 
   const [board, setBoard] = useState<Board>(Array(9).fill(Array(9).fill("")));
   const [selectedCell, setSelectedCell] = useState<SelectedCell>(null);
   const [timer, setTimer] = useState<number>(0);
-
+  const [pause, setPause] = useState<boolean>(false);
+  // const [check , setCheck] = useState<string>('')
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimer((prev) => prev + 1);
+      if(!pause){
+        setTimer((prev) => prev + 1);
+      }
     }, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [pause]);
 
   const formatTime = (time: number): string => {
     const minutes = Math.floor(time / 60);
@@ -99,12 +103,32 @@ export default function SoloPlayer() {
     setBoard(Array(9).fill(Array(9).fill("")));
   };
 
-  const handleSubmit = (): void => {
-    console.log("Submit clicked");
+  const handleSubmit = () => {
+    console.log("inside check");
+  
+    for (let boxRow = 0; boxRow < 3; boxRow++) {
+      for (let boxCol = 0; boxCol < 3; boxCol++) {
+        let localCheck = "";
+        for (let row = boxRow * 3; row < boxRow * 3 + 3; row++) {
+          for (let col = boxCol * 3; col < boxCol * 3 + 3; col++) {
+            localCheck += board[row][col];
+          }
+        }  
+        console.log("String made for box:", localCheck);
+        if (localCheck.length === 9) {
+          if ([...new Set(localCheck)].join("").length === 9) {
+            console.log("Box is good");
+          } else {
+            console.log("Box is not good");
+          }
+        }
+      }
+    }
   };
+  
 
   const handlePause = () => {
-    setTimer(0);
+    setPause(!pause)
   };
 
   function moveFocus(direction: string) {
@@ -128,9 +152,9 @@ export default function SoloPlayer() {
           break;
       }
       const nextCell = actRef.current[newRow][newCol];
-    nextCell?.focus();
+      nextCell?.focus();
 
-    return { row: newRow, col: newCol };
+      return { row: newRow, col: newCol };
     });
   }
 
@@ -154,6 +178,8 @@ export default function SoloPlayer() {
       window.removeEventListener("keydown", Pressed);
     };
   });
+
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-indigo-50 to-white p-4">
