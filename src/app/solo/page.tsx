@@ -105,7 +105,28 @@ export default function SoloPlayer() {
 
   const handleSubmit = () => {
     console.log("inside check");
-  
+    // handle rows
+    board.forEach((rows) => {
+      if(rows.length === 9 && new Set(rows).size === 9){
+        // true
+      }
+    })
+    // handle cols
+    for(let i = 0;i<9;i++){
+      let localCheck=""
+      for (let j=0;j<9;j++){
+        localCheck+=(board[j][i])
+      }
+      if (localCheck.length === 9) {
+        if ([...new Set(localCheck)].join("").length === 9) {
+          console.log("col is good");
+        } else {
+          console.log("col is not good");
+        }
+      }
+      console.log(localCheck)
+    }
+  //  boxes handled
     for (let boxRow = 0; boxRow < 3; boxRow++) {
       for (let boxCol = 0; boxCol < 3; boxCol++) {
         let localCheck = "";
