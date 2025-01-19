@@ -1,7 +1,10 @@
 "use client";
 import React, { useState, useEffect, ChangeEvent, useRef } from "react";
 import { Timer, Trash2, CheckCircle } from "lucide-react";
-
+import TopBar from "@/components/Topbar";
+import {Suokuset} from '@/app/mockSets/sudoku'
+import { Clearmodal } from "@/components/Clearmodal";
+import { Button } from "@/components/ui/button";
 type Board = string[][];
 type SelectedCell = {
   row: number;
@@ -54,6 +57,7 @@ const Cell: React.FC<CellProps> = ({
       }
       text-sm sm:text-base
     `}
+    // disabled={}
     onFocus={onFocus}
     onBlur={onBlur}
   />
@@ -66,10 +70,11 @@ export default function SoloPlayer() {
       .map(() => Array(9).fill(null))
   );
 
-  const [board, setBoard] = useState<Board>(Array(9).fill(Array(9).fill("")));
+  const [board, setBoard] = useState<Board>(Suokuset);
   const [selectedCell, setSelectedCell] = useState<SelectedCell>(null);
   const [timer, setTimer] = useState<number>(0);
-  const [pause, setPause] = useState<boolean>(false);
+  const [pause, setPause] = useState<boolean>(true);
+  const [clear , setClear] = useState<boolean>(false)
   // const [check , setCheck] = useState<string>('')
   useEffect(() => {
     const interval = setInterval(() => {
@@ -100,7 +105,8 @@ export default function SoloPlayer() {
   };
 
   const clearBoard = (): void => {
-    setBoard(Array(9).fill(Array(9).fill("")));
+    setClear(true)
+    // setBoard(Suokuset);
   };
 
   const handleSubmit = () => {
@@ -203,27 +209,33 @@ export default function SoloPlayer() {
   
 
   return (
+    <>
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-indigo-50 to-white p-4">
-      {/* Timer */}
+    <TopBar playerName="Kapil"/>
+      
       <div className="h-auto w-auto flex flex-row justify-start gap-4 ">
-        <button className="flex items-center h-10 w-20 text-center  px-6 py-2 border border-indigo-600 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+        <Button 
+        onClick={() => setPause(false)}
+        disabled={!pause}
+        className="flex items-center h-10 w-20 text-center bg-blue-600  px-6 py-2 border border-indigo-600 rounded-lg hover:bg-blue-300 hover:text-blue-600 transition-colors text-sm"
+        >
           Start
-        </button>
+        </Button>
 
         <div className="flex items-center gap-2 mb-6 bg-white px-4 py-2 rounded-lg shadow-sm">
           <Timer size={16} className="text-indigo-600" />
           <span className="text-sm font-medium">{formatTime(timer)}</span>
         </div>
 
-        <button
-          className="flex items-center h-10 w-20 text-center  px-6 py-2 border border-indigo-600 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+        <Button
+        className="flex items-center h-10 w-20 text-center bg-blue-600  px-6 py-2 border border-indigo-600 rounded-lg hover:bg-blue-300 hover:text-blue-600 transition-colors text-sm"
           onClick={handlePause}
+          disabled={pause}
         >
           Pause
-        </button>
+        </Button>
       </div>
 
-      {/* Sudoku Board */}
       <div className="w-full max-w-md aspect-square bg-white rounded-lg shadow-sm p-2">
         <div className="grid grid-cols-9 gap-px bg-gray-200 h-full">
           {board.map((row, rowIndex) =>
@@ -250,7 +262,7 @@ export default function SoloPlayer() {
         </div>
       </div>
 
-      {/* Controls */}
+
       <div className="flex gap-4 mt-6">
         <button
           onClick={clearBoard}
@@ -268,5 +280,7 @@ export default function SoloPlayer() {
         </button>
       </div>
     </div>
+    <Clearmodal open={clear} onClose={() => setClear(false)} onYes={() => setBoard(Suokuset)}/>
+    </>
   );
 }
